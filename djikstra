@@ -1,0 +1,79 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <climits>
+#include <limits>
+
+using namespace std;
+
+// Struktur Node untuk merepresentasikan simpul dalam graf
+struct Node {
+    int id; // ID simpul
+    vector<pair<int, int>> neighbors; // Daftar tetangga simpul beserta bobotnya
+};
+
+// Fungsi Dijkstra untuk mencari jalur terpendek dari simpul awal ke semua simpul lainnya
+vector<int> dijkstra(vector<Node>& graph, int start) {
+    // Inisialisasi vektor distances dengan nilai maksimum untuk semua simpul
+    vector<int> distances(graph.size(), INT_MAX);
+    // Inisialisasi vektor visited untuk menandai simpul yang telah dikunjungi
+    vector<bool> visited(graph.size(), false);
+    // Inisialisasi priority queue untuk menyimpan simpul yang akan dikunjungi
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+
+    // Set nilai distances untuk simpul awal menjadi 0
+    distances[start] = 0;
+    // Tambahkan simpul awal ke priority queue
+    pq.push({0, start});
+
+    // Loop sampai priority queue kosong
+    while (!pq.empty()) {
+        // Ambil simpul dengan nilai distances terkecil dari priority queue
+        int current = pq.top().second;
+        pq.pop();
+
+        // Jika simpul sudah dikunjungi, skip
+        if (visited[current]) continue;
+
+        // Tandai simpul sebagai dikunjungi
+        visited[current] = true;
+
+        // Loop untuk semua tetangga simpul current
+        for (auto& neighbor : graph[current].neighbors) {
+            int neighborId = neighbor.first; // ID tetangga
+            int weight = neighbor.second; // Bobot jalur ke tetangga
+
+            // Jika jalur ke tetangga lebih pendek dari nilai distances saat ini, update nilai distances
+            if (distances[current] + weight < distances[neighborId]) {
+                distances[neighborId] = distances[current] + weight;
+                // Tambahkan tetangga ke priority queue
+                pq.push({distances[neighborId], neighborId});
+            }
+        }
+    }
+
+    // Return vektor distances yang berisi jalur terpendek dari simpul awal ke semua simpul lainnya
+    return distances;
+}
+
+int main() {
+    // Inisialisasi graf dengan 6 simpul
+    vector<Node> graph(6);
+
+    // Definisikan graf
+    graph[0].id = 0;
+    graph[0].neighbors = {{1, 4}, {2, 2}};
+
+    graph[1].id = 1;
+    graph[1].neighbors = {{0, 4}, {3, 5}};
+
+    graph[2].id = 2;
+    graph[2].neighbors = {{0, 2}, {3, 1}};
+
+    graph[3].id = 3;
+    graph[3].neighbors = {{1, 5}, {2, 1}, {4, 3}};
+
+    graph[4].id = 4;
+    graph[4].neighbors = {{3, 3}, {5, 2}};
+
+    graph[5].id = 5;
